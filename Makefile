@@ -18,10 +18,10 @@ build:
 
 deploy:
 	fly deploy --remote-only -a $(FLY_APP)
-	fly vm status $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
 	$(MAKE) logs
 
 restart:
+	fly vm status $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
 	fly vm restart $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
 
 s1:
