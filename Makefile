@@ -17,7 +17,7 @@ build:
 	docker build . -t flydev
 
 deploy:
-	fly deploy --local-only -a $(FLY_APP)
+	fly deploy --remote-only --no-cache -a $(FLY_APP)
 	$(MAKE) logs
 
 s1:

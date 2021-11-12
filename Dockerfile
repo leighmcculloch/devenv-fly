@@ -25,6 +25,7 @@ COPY sshd_config /etc/ssh/sshd_config
 RUN curl -fsSL https://get.docker.com | sh
 
 # Dotfiles
+ADD https://api.github.com/repos/leighmcculloch/dotfiles/commits?per_page=1 /dev/null
 RUN git clone https://github.com/leighmcculloch/dotfiles /root/.dotfiles
 RUN cd /root/.dotfiles && ./install.sh
 
