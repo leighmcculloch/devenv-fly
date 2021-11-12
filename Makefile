@@ -10,12 +10,12 @@ status:
 
 create1:
 	fly apps create --org $(FLY_ORG) $(FLY_APP)
-	$(MAKE) s1
+	$(MAKE) size1
 	$(MAKE) deploy
 
 create8:
 	fly apps create --org $(FLY_ORG) $(FLY_APP)
-	$(MAKE) s8
+	$(MAKE) size8
 	$(MAKE) deploy
 
 build:
