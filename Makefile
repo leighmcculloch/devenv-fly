@@ -18,7 +18,11 @@ build:
 
 deploy:
 	fly deploy --remote-only -a $(FLY_APP)
+	fly vm status $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
 	$(MAKE) logs
+
+restart:
+	fly vm restart $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
 
 s1:
 	fly scale vm -a $(FLY_APP) shared-cpu-1x --memory=2048
