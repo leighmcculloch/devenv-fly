@@ -4,6 +4,10 @@ FLY_APP?=flydev
 logs:
 	fly logs -a $(FLY_APP)
 
+status:
+	fly status -a $(FLY_APP)
+	fly scale show -a $(FLY_APP)
+
 create:
 	fly apps create --org $(FLY_ORG) $(FLY_APP)
 	$(MAKE) s1

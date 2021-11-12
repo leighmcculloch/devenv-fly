@@ -17,11 +17,9 @@ RUN apt install -y tailscale
 
 # SSHD
 RUN DEBIAN_FRONTEND="noninteractive" apt install -y openssh-server
+RUN passwd -d root
 RUN mkdir /var/run/sshd
-RUN echo 'root:root' | chpasswd
-RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-RUN mkdir /root/.ssh
+COPY sshd_config /etc/ssh/sshd_config
 
 # Docker
 RUN curl -fsSL https://get.docker.com | sh
