@@ -5,25 +5,30 @@ set -e
 echo "Starting tailscale daemon..."
 tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock &
 echo "Starting tailscale up..."
-until tailscale up --hostname=flydev
+until tailscale up --hostname=flydev --authkey=$TAILSCALE_AUTHKEY
 do
     sleep 0.1
 done
 
 echo "Starting docker..."
 mkdir -p /data/docker /etc/docker
-echo '{"data-root": "/data/docker", "ipv6": true, "fixed-cidr-v6": "2001:db8:1::/64"}' > /etc/docker/daemon.json
+echo '{"data-root": "/data/docker"}' > /etc/docker/daemon.json
 service docker start
-sleep 2
-ip -6 route add 2001:db8:1::/64 dev docker0
-sysctl net.ipv6.conf.default.forwarding=1
-sysctl net.ipv6.conf.all.forwarding=1
-ip6tables -t nat -A POSTROUTING -s 2001:db8:1::/64 -j MASQUERADE
 
 echo "Configuring inotify for VSCode..."
 sysctl -w fs.inotify.max_user_watches=524288
 
+echo "Setting up workspace directory..."
+mkdir -p /data/workspace
+
+echo "Linking any persistent files and directories..."
+ln -s /data/zsh_history /root/.zsh_history
+ln -s /data/workspace /root/workspace
+
 echo "Starting sshd..."
-/usr/sbin/sshd -D
+service ssh start
+
+trap : TERM INT
+sleep infinity & wait
 
 echo "Exiting..."

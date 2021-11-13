@@ -1,5 +1,9 @@
 FLY_ORG?=personal
 FLY_APP?=flydev
+FLY_REGION?=sjc
+TAILSCALE_AUTHKEY=
+
+# STATUS
 
 logs:
 	fly logs -a $(FLY_APP)
@@ -7,33 +11,39 @@ logs:
 status:
 	fly status -a $(FLY_APP)
 	fly scale show -a $(FLY_APP)
+	fly volumes list -a $(FLY_APP)
 
-create1:
-	fly apps create --org $(FLY_ORG) $(FLY_APP)
-	$(MAKE) size1
-	$(MAKE) deploy
+# SETUP AND DESTROY
 
-create8:
+setup:
 	fly apps create --org $(FLY_ORG) $(FLY_APP)
+	fly secrets set -a $(FLY_APP) TAILSCALE_AUTHKEY=$(TAILSCALE_AUTHKEY)
+
+destroy:
+	fly apps destroy -y $(FLY_APP)
+
+# INSTANCE
+
+create:
+	fly volumes create -a $(FLY_APP) --region $(FLY_REGION) --size 40 data
 	$(MAKE) size8
-	$(MAKE) deploy
+	$(MAKE) push
 
-build:
-	docker build . -t flydev
+terminate:
+	fly volumes delete -a $(FLY_APP) --region $(FLY_REGION) --size 40 data
+	fly scale -a $(FLY_APP) count 0
 
-deploy:
-	fly deploy --remote-only -a $(FLY_APP)
-	$(MAKE) logs
+push:
+	fly deploy -a $(FLY_APP) --remote-only --strategy immediate
 
-restart:
-	fly vm status $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
-	fly vm restart $$(fly status -a $(FLY_APP) --json | jq -r '.App.Allocations[0].IDShort') -a $(FLY_APP)
+start:
+	fly scale -a $(FLY_APP) count 1
+
+stop:
+	fly scale -a $(FLY_APP) count 0
 
 size1:
 	fly scale vm -a $(FLY_APP) shared-cpu-1x --memory=2048
 
 size8:
 	fly scale vm -a $(FLY_APP) dedicated-cpu-8x --memory=16384
-
-destroy:
-	fly apps destroy -y $(FLY_APP)

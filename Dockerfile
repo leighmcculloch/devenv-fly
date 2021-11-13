@@ -16,7 +16,7 @@ RUN apt update
 RUN apt install -y tailscale
 
 # SSHD
-RUN DEBIAN_FRONTEND="noninteractive" apt install -y openssh-server
+RUN apt install -y openssh-server
 RUN passwd -d root
 RUN mkdir /var/run/sshd
 COPY sshd_config /etc/ssh/sshd_config
