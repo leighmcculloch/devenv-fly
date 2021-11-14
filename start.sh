@@ -5,7 +5,7 @@ set -e
 echo "Starting tailscale daemon..."
 tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock &
 echo "Starting tailscale up..."
-until tailscale up --hostname=flydev --authkey=$TAILSCALE_AUTHKEY
+until tailscale up --hostname=dev --authkey=$TAILSCALE_AUTHKEY
 do
     sleep 0.1
 done

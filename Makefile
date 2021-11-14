@@ -1,5 +1,5 @@
 FLY_ORG?=personal
-FLY_APP?=flydev
+FLY_APP?=de4l
 FLY_REGION?=sjc
 TAILSCALE_AUTHKEY=
 

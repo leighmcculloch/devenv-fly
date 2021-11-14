@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-RUN DEBIAN_FRONTEND="noninteractive"
+ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt update
 RUN apt install -y sudo locales curl gnupg2 git zsh
@@ -22,7 +22,12 @@ RUN mkdir /var/run/sshd
 COPY sshd_config /etc/ssh/sshd_config
 
 # Docker
-RUN curl -fsSL https://get.docker.com | sh
+RUN apt update
+RUN apt install -y ca-certificates curl gnupg lsb-release
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt update
+RUN apt install -y docker-ce docker-ce-cli containerd.io
 
 # Dotfiles
 ADD https://api.github.com/repos/leighmcculloch/dotfiles/commits?per_page=1 /dev/null
@@ -32,7 +37,7 @@ RUN cd /root/.dotfiles && ./install.sh
 # Set default shell to ZSH
 RUN chsh -s /usr/bin/zsh
 
-RUN DEBIAN_FRONTEND="dialog"
+ENV DEBIAN_FRONTEND="dialog"
 
 COPY ./start.sh ./start.sh
 CMD ["./start.sh"]
